@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NPC EA Household Count Upload</title>
+  <style>
+    :root{
+      --npc-green:#0b7a3b;
+      --npc-green-2:#0a6a34;
+      --bg:#f4f7f5;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --border:#e2e8f0;
+      --shadow: 0 10px 25px rgba(0,0,0,0.08);
+      --shadow2: 0 6px 14px rgba(0,0,0,0.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,"Noto Sans","Liberation Sans",sans-serif;background:var(--bg);color:var(--text)}
+    a{color:var(--npc-green);text-decoration:none}
+    .page{max-width:980px;margin:0 auto;padding:28px 18px 48px}
+    .header{display:flex;gap:14px;align-items:center;margin-bottom:18px}
+    .logo{width:64px;height:64px;border-radius:14px;background:#fff;box-shadow:var(--shadow2);display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid var(--border)}
+    .logo img{width:54px;height:54px;object-fit:contain}
+    .titleblock h1{margin:0;font-size:20px;letter-spacing:0.2px}
+    .titleblock p{margin:4px 0 0;color:var(--muted);font-size:13px;line-height:1.35}
+    .grid{display:grid;grid-template-columns: 1.1fr 0.9fr;gap:16px}
+    @media (max-width: 860px){.grid{grid-template-columns:1fr}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:16px}
+    .card h2{margin:0 0 10px;font-size:15px}
+    .hint{color:var(--muted);font-size:12px;line-height:1.4}
+    .field{margin-top:12px}
+    label{display:block;font-size:12px;color:#334155;margin-bottom:6px}
+    input[type="text"], input[type="date"], input[type="file"]{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--border);background:#fff;outline:none;font-size:13px;}
+    input:focus{border-color:var(--npc-green)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width: 520px){.row{grid-template-columns:1fr}}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    button{border:0;border-radius:12px;padding:11px 14px;font-weight:600;font-size:13px;cursor:pointer;box-shadow:var(--shadow2);}
+    .btn-primary{background:var(--npc-green);color:#fff}
+    .btn-primary:hover{background:var(--npc-green-2)}
+    .btn-ghost{background:#ecfdf3;color:var(--npc-green);border:1px solid #bbf7d0}
+    .btn-ghost:hover{background:#dcfce7}
+    .banner{margin-top:12px;border-radius:14px;padding:12px 12px;border:1px solid var(--border);display:none}
+    .banner.success{background:#ecfdf3;border-color:#bbf7d0}
+    .banner.warn{background:#fffbeb;border-color:#fde68a}
+    .banner.error{background:#fef2f2;border-color:#fecaca}
+    .banner .btitle{font-weight:700;margin:0 0 4px;font-size:13px}
+    .banner .bmsg{margin:0;color:#334155;font-size:12.5px;line-height:1.35}
+    .kpi{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+    .pill{border:1px solid var(--border);border-radius:14px;padding:10px;background:#fff}
+    .pill .k{font-size:11px;color:var(--muted)}
+    .pill .v{font-size:16px;font-weight:800;margin-top:2px}
+    .pre{margin-top:12px;border-radius:14px;border:1px solid var(--border);background:#0b1220;color:#e5e7eb;overflow:auto;max-height:320px}
+    pre{margin:0;padding:12px;font-size:12px;line-height:1.35}
+    .footer{margin-top:18px;color:var(--muted);font-size:11.5px}
+    .rules{margin:10px 0 0;padding-left:18px;color:var(--muted);font-size:12px;line-height:1.4}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <div class="logo"><img src="/static/npc-logo.jpeg" alt="NPC logo" /></div>
+      <div class="titleblock">
+        <h1>National Population Commission - EA Household Count Upload</h1>
+        <p>Upload the approved CSV template to update <b>HOUSEHOLD_COUNT</b> per EA using <b>NAT_EA_SN</b> as the primary key.</p>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Upload details</h2>
+        <p class="hint">Please complete the fields below before uploading. Upload metadata is stored for audit and QA.</p>
+
+        <div class="field">
+          <label>Client Name</label>
+          <input id="clientName" type="text" placeholder="e.g., UNICEF Nigeria" />
+        </div>
+
+        <div class="field">
+          <label>Client Project</label>
+          <input id="clientProject" type="text" placeholder="e.g., MICS Household Listing 2026" />
+        </div>
+
+        <div class="field row">
+          <div>
+            <label>Date of Collection</label>
+            <input id="collectionDate" type="date" />
+          </div>
+          <div>
+            <label>CSV File</label>
+            <input id="file" type="file" accept=".csv" />
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn-primary" id="btnUpload">Upload CSV</button>
+          <button class="btn-ghost" id="btnTemplate">View template</button>
+          <button class="btn-ghost" id="btnClear">Clear</button>
+        </div>
+
+        <div class="banner" id="banner">
+          <p class="btitle" id="bTitle"></p>
+          <p class="bmsg" id="bMsg"></p>
+        </div>
+
+        <div class="kpi" id="kpi" style="display:none;">
+          <div class="pill"><div class="k">Updated rows</div><div class="v" id="kUpdated">-</div></div>
+          <div class="pill"><div class="k">Skipped conflicts (60d)</div><div class="v" id="kConflicts">-</div></div>
+          <div class="pill"><div class="k">Invalid rows</div><div class="v" id="kInvalid">-</div></div>
+          <div class="pill"><div class="k">Valid rows loaded</div><div class="v" id="kValid">-</div></div>
+        </div>
+
+        <div class="pre" id="raw" style="display:none;">
+          <pre id="out"></pre>
+        </div>
+
+        <div class="footer">
+          CSV header must be exactly: <code>NAT_EA_SN,HOUSEHOLD_COUNT</code>
+          <ul class="rules">
+            <li>Duplicate <b>NAT_EA_SN</b> inside the same file is rejected.</li>
+            <li>Re-uploading the same file is safe (already-processed detection).</li>
+            <li>If another client uploaded the same EA within 60 days, the EA is not overwritten; it is recorded in history and reported as a conflict.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Help</h2>
+        <p class="hint">Use the template button to confirm the exact header. If you get an error, fix the CSV and re-upload.</p>
+
+        <div class="pre" style="margin-top:12px;">
+          <pre id="template">Template:
+NAT_EA_SN,HOUSEHOLD_COUNT
+</pre>
+        </div>
+
+        <p class="hint" style="margin-top:12px;">Note: This portal stores upload metadata (client name, project, collection date) and maintains a history table for audit.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const el = (id) => document.getElementById(id);
+
+    const banner = el('banner');
+    const bTitle = el('bTitle');
+    const bMsg = el('bMsg');
+    const out = el('out');
+    const raw = el('raw');
+    const kpi = el('kpi');
+
+    function showBanner(kind, title, msg){
+      banner.className = 'banner ' + kind;
+      bTitle.textContent = title;
+      bMsg.textContent = msg;
+      banner.style.display = 'block';
+    }
+
+    function clearBanner(){
+      banner.style.display = 'none';
+      bTitle.textContent = '';
+      bMsg.textContent = '';
+    }
+
+    function setKPIs(summary){
+      if(!summary){ kpi.style.display = 'none'; return; }
+      el('kUpdated').textContent = summary.updated_rows ?? '-';
+      el('kConflicts').textContent = summary.skipped_conflicts ?? '-';
+      el('kInvalid').textContent = summary.invalid_rows ?? '-';
+      el('kValid').textContent = summary.valid_rows_loaded ?? '-';
+      kpi.style.display = 'grid';
+    }
+
+    async function safeParseJson(res){
+      const txt = await res.text();
+      try {
+        return { ok: true, data: JSON.parse(txt) };
+      } catch(e){
+        return { ok: false, text: txt };
+      }
+    }
+
+    el('btnTemplate').onclick = async () => {
+      clearBanner();
+      try{
+        const res = await fetch('/template');
+        const parsed = await safeParseJson(res);
+        if(parsed.ok){
+          const t = parsed.data.template_csv || 'NAT_EA_SN,HOUSEHOLD_COUNT\n';
+          el('template').textContent = 'Template:\n' + t;
+          showBanner('success','Template ready','You can copy the header and fill your rows.');
+        } else {
+          showBanner('error','Unexpected response','Could not load template. Please try again.');
+        }
+      } catch(e){
+        showBanner('error','Network error','Please check your internet connection and try again.');
+      }
+    };
+
+    el('btnClear').onclick = () => {
+      el('clientName').value = '';
+      el('clientProject').value = '';
+      el('collectionDate').value = '';
+      el('file').value = '';
+      clearBanner();
+      raw.style.display = 'none';
+      out.textContent = '';
+      kpi.style.display = 'none';
+    };
+
+    el('btnUpload').onclick = async () => {
+      clearBanner();
+      raw.style.display = 'none';
+      kpi.style.display = 'none';
+
+      const clientName = el('clientName').value.trim();
+      const clientProject = el('clientProject').value.trim();
+      const collectionDate = el('collectionDate').value;
+      const file = el('file').files[0];
+
+      if(!clientName){ showBanner('warn','Missing field','Please enter Client Name.'); return; }
+      if(!clientProject){ showBanner('warn','Missing field','Please enter Client Project.'); return; }
+      if(!collectionDate){ showBanner('warn','Missing field','Please choose Date of Collection.'); return; }
+      if(!file){ showBanner('warn','Missing file','Please choose a CSV file.'); return; }
+
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('client_name', clientName);
+      fd.append('client_project', clientProject);
+      fd.append('collection_date', collectionDate);
+
+      showBanner('warn','Uploading...','Please wait while we validate and apply your upload.');
+
+      try{
+        const res = await fetch('/upload/hhcount', { method:'POST', body: fd });
+        const parsed = await safeParseJson(res);
+
+        if(!parsed.ok){
+          showBanner('error','Unexpected server response','The server returned an unexpected response. Please try again or contact the administrator.');
+          raw.style.display = 'block';
+          out.textContent = parsed.text || '';
+          return;
+        }
+
+        const data = parsed.data;
+        const ok = !!data.ok;
+        const title = data.title || (ok ? 'Upload complete' : 'Upload failed');
+        const msg = data.message || '';
+
+        showBanner(data.level || (ok ? 'success' : 'error'), title, msg);
+        setKPIs(data.summary);
+
+        raw.style.display = 'block';
+        out.textContent = JSON.stringify(data, null, 2);
+
+      } catch(e){
+        showBanner('error','Network error','Please check your internet connection and try again.');
+      }
+    };
+  </script>
+</body>
+</html>
